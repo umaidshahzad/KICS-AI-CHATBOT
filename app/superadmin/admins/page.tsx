@@ -21,7 +21,8 @@ export default function SuperAdminAdminsPage() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'active'>('all');
 
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newAdmin, setNewAdmin] = useState({ name: '', email: '', role: 'Admin' });
+  const [newAdmin, setNewAdmin] = useState({ name: '', email: '', password: '', role: 'Admin' });
+  const [addError, setAddError] = useState<string | null>(null);
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [editAdmin, setEditAdmin] = useState<AdminUser | null>(null);
@@ -35,11 +36,20 @@ export default function SuperAdminAdminsPage() {
       const res = await fetch('/api/mock/users');
       const data = await res.json();
       // Filter out regular users to only show admins
-      const adminUsers = data.filter((u: any) => u.role !== 'user').map((u: any) => ({
-        ...u,
-        lastLogin: 'Today', // Mock last login
-        status: u.status || 'Active'
-      }));
+      const adminUsers = data.filter((u: any) => u.role !== 'user').map((u: any) => {
+        let lastLoginText = 'Never';
+        if (u.lastLogin) {
+          const date = new Date(u.lastLogin);
+          lastLoginText = isNaN(date.getTime()) ? 'Never' : date.toLocaleString('en-US', { 
+            month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+          });
+        }
+        return {
+          ...u,
+          lastLogin: lastLoginText,
+          status: u.status || 'active'
+        };
+      });
       setAdmins(adminUsers);
     } catch (error) {
       console.error('Failed to fetch admins', error);
@@ -50,6 +60,7 @@ export default function SuperAdminAdminsPage() {
 
   const handleAddAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAddError(null);
     if (!newAdmin.name || !newAdmin.email) return;
 
     try {
@@ -59,28 +70,51 @@ export default function SuperAdminAdminsPage() {
         body: JSON.stringify({
           name: newAdmin.name,
           email: newAdmin.email,
+          password: newAdmin.password,
           role: newAdmin.role,
-          status: 'Active'
+          status: 'active'
         })
       });
+      
+      const data = await res.json();
+      
       if (res.ok) {
-        const addedUser = await res.json();
-        setAdmins([{ ...addedUser, lastLogin: 'Never' }, ...admins]);
+        setAdmins([{ ...data, lastLogin: 'Never' }, ...admins]);
         setShowAddModal(false);
-        setNewAdmin({ name: '', email: '', role: 'Admin' });
+        setNewAdmin({ name: '', email: '', password: '', role: 'Admin' });
+      } else {
+        setAddError(data.error || 'Failed to add admin');
       }
     } catch (error) {
       console.error('Failed to add admin', error);
+      setAddError('An unexpected error occurred');
     }
   };
 
-  const handleDeactivate = (id: string) => {
-    setAdmins(admins.map(admin => 
-      admin.id === id 
-        ? { ...admin, status: admin.status === 'Active' ? 'Inactive' : 'Active' } 
-        : admin
-    ));
-    // In a real app, we would make a PUT/PATCH request to update the user here
+  const handleDeactivate = async (id: string) => {
+    const adminToUpdate = admins.find(a => a.id === id);
+    if (!adminToUpdate) return;
+    
+    const newStatus = adminToUpdate.status?.toLowerCase() === 'active' ? 'inactive' : 'active';
+    
+    try {
+      const res = await fetch('/api/mock/admin/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus })
+      });
+      
+      if (res.ok) {
+        setAdmins(admins.map(admin => 
+          admin.id === id ? { ...admin, status: newStatus } : admin
+        ));
+      } else {
+        alert('Failed to update status');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating status');
+    }
   };
 
   const handleUpdateAdmin = async (e: React.FormEvent) => {
@@ -93,15 +127,24 @@ export default function SuperAdminAdminsPage() {
     setEditAdmin(null);
   };
 
-  const handleDeleteAdmin = (id: string) => {
+  const handleDeleteAdmin = async (id: string) => {
     if (confirm('Are you sure you want to delete this admin?')) {
-      setAdmins(admins.filter(admin => admin.id !== id));
-      // In a real app, make a DELETE request here
+      try {
+        const res = await fetch(`/api/mock/users?id=${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          setAdmins(admins.filter(admin => admin.id !== id));
+        } else {
+          console.error('Failed to delete admin');
+          alert('Failed to delete admin');
+        }
+      } catch (error) {
+        console.error('Failed to delete admin', error);
+      }
     }
   };
 
   const displayedAdmins = admins.filter(admin => {
-    if (activeFilter === 'active') return admin.status === 'active' || admin.status === 'Active';
+    if (activeFilter === 'active') return admin.status?.toLowerCase() === 'active';
     return true;
   });
 
@@ -205,10 +248,10 @@ export default function SuperAdminAdminsPage() {
                       </button>
                       <button 
                         onClick={() => handleDeactivate(admin.id)}
-                        className={`p-1.5 text-on-surface-variant rounded-md transition-colors ${admin.status === 'Active' || admin.status === 'active' ? 'hover:text-error hover:bg-error-container' : 'hover:text-green-600 hover:bg-green-100'}`} 
-                        title={admin.status === 'Active' || admin.status === 'active' ? 'Deactivate' : 'Activate'}
+                        className={`p-1.5 text-on-surface-variant rounded-md transition-colors ${admin.status?.toLowerCase() === 'active' ? 'hover:text-error hover:bg-error-container' : 'hover:text-green-600 hover:bg-green-100'}`} 
+                        title={admin.status?.toLowerCase() === 'active' ? 'Deactivate' : 'Activate'}
                       >
-                        <span className="material-symbols-outlined text-[20px]">{admin.status === 'Active' || admin.status === 'active' ? 'block' : 'check_circle'}</span>
+                        <span className="material-symbols-outlined text-[20px]">{admin.status?.toLowerCase() === 'active' ? 'block' : 'check_circle'}</span>
                       </button>
                       <button 
                         onClick={() => handleDeleteAdmin(admin.id)}
@@ -237,6 +280,11 @@ export default function SuperAdminAdminsPage() {
               </button>
             </div>
             <form onSubmit={handleAddAdmin} className="p-6 space-y-4">
+              {addError && (
+                <div className="p-3 rounded-lg bg-error-container text-error font-body-sm font-bold">
+                  {addError}
+                </div>
+              )}
               <div>
                 <label className="block font-label-sm font-bold text-on-surface-variant uppercase tracking-wider mb-1">Full Name</label>
                 <input 
@@ -257,6 +305,17 @@ export default function SuperAdminAdminsPage() {
                   onChange={e => setNewAdmin({...newAdmin, email: e.target.value})}
                   className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2 text-on-surface focus:outline-none focus:border-primary"
                   placeholder="jane@example.com"
+                />
+              </div>
+              <div>
+                <label className="block font-label-sm font-bold text-on-surface-variant uppercase tracking-wider mb-1">Temporary Password</label>
+                <input 
+                  type="password" 
+                  required
+                  value={newAdmin.password}
+                  onChange={e => setNewAdmin({...newAdmin, password: e.target.value})}
+                  className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2 text-on-surface focus:outline-none focus:border-primary"
+                  placeholder="••••••••"
                 />
               </div>
               <div>
