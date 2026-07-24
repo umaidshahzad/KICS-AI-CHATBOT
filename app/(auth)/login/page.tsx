@@ -21,7 +21,11 @@ export default function LoginPage() {
       const res = await AuthService.loginWithCredentials(email, password);
       
       if (res?.error) {
-        setError('Invalid credentials. Try user@example.com, admin@example.com, or superadmin@example.com.');
+        if (res.error === 'CredentialsSignin') {
+          setError('Invalid email or password.');
+        } else {
+          setError(res.error);
+        }
       } else {
         // Fetch session to determine role
         const sessionRes = await fetch('/api/auth/session');
