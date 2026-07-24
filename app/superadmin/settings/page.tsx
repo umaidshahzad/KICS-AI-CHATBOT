@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 export default function SuperAdminSettingsPage() {
-  const [activeTab, setActiveTab] = useState<'general' | 'security' | 'billing'>('general');
+  const [activeTab, setActiveTab] = useState<'general'>('general');
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   const handleSave = (e: React.FormEvent) => {
@@ -34,20 +34,6 @@ export default function SuperAdminSettingsPage() {
               <span className="material-symbols-outlined text-[20px]">tune</span>
               General Preferences
             </button>
-            <button 
-              onClick={() => setActiveTab('security')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-label-md font-bold transition-all text-left whitespace-nowrap ${activeTab === 'security' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'}`}
-            >
-              <span className="material-symbols-outlined text-[20px]">security</span>
-              Security & Auth
-            </button>
-            <button 
-              onClick={() => setActiveTab('billing')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-label-md font-bold transition-all text-left whitespace-nowrap ${activeTab === 'billing' ? 'bg-primary text-on-primary shadow-sm' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'}`}
-            >
-              <span className="material-symbols-outlined text-[20px]">credit_card</span>
-              Billing & Quotas
-            </button>
           </nav>
         </div>
 
@@ -77,63 +63,6 @@ export default function SuperAdminSettingsPage() {
                     <option>Light Mode</option>
                     <option>Dark Mode</option>
                   </select>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'security' && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <h3 className="font-headline-md text-xl font-bold text-primary mb-4 border-b border-outline-variant pb-2">Security & Authentication</h3>
-                
-                <div className="flex items-center justify-between p-4 border border-outline-variant rounded-xl bg-surface-container-low">
-                  <div>
-                    <p className="font-label-md font-bold text-on-surface">Require Two-Factor Authentication</p>
-                    <p className="font-body-sm text-on-surface-variant mt-1">Enforce 2FA for all administrative accounts.</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
-                    <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary transition-colors"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border border-outline-variant rounded-xl bg-surface-container-low">
-                  <div>
-                    <p className="font-label-md font-bold text-on-surface">Session Timeout</p>
-                    <p className="font-body-sm text-on-surface-variant mt-1">Automatically log out inactive sessions.</p>
-                  </div>
-                  <select className="bg-surface-container border border-outline-variant rounded-lg px-3 py-2 text-on-surface text-sm font-bold focus:outline-none focus:border-primary">
-                    <option>15 Minutes</option>
-                    <option>30 Minutes</option>
-                    <option>1 Hour</option>
-                    <option>Never</option>
-                  </select>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'billing' && (
-              <div className="space-y-6 animate-in fade-in duration-300">
-                <h3 className="font-headline-md text-xl font-bold text-primary mb-4 border-b border-outline-variant pb-2">Billing & Quotas</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block font-label-sm font-bold text-on-surface-variant uppercase tracking-wider mb-2">Default Free Tier Tokens</label>
-                    <input type="number" defaultValue={50000} className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block font-label-sm font-bold text-on-surface-variant uppercase tracking-wider mb-2">Global Rate Limit (Req/Min)</label>
-                    <input type="number" defaultValue={1000} className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary transition-colors" />
-                  </div>
-                </div>
-
-                <div className="p-4 bg-secondary-container/20 border border-secondary/30 rounded-xl">
-                  <div className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-secondary">info</span>
-                    <div>
-                      <p className="font-label-md font-bold text-on-surface">Enterprise Billing Engine</p>
-                      <p className="font-body-sm text-on-surface-variant mt-1">Changes to billing quotas take effect immediately and apply to all newly created organizations. Existing custom quotas will not be overridden.</p>
-                    </div>
-                  </div>
                 </div>
               </div>
             )}
