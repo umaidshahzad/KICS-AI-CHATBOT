@@ -7,7 +7,6 @@ import Link from 'next/link';
 
 export function SuperAdminHeader() {
   const dispatch = useDispatch();
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [avatar, setAvatar] = useState<string | null>(null);
 
@@ -35,42 +34,11 @@ export function SuperAdminHeader() {
       </div>
 
       <div className="flex items-center gap-2 md:gap-4 relative">
-        <div className="relative">
-          <button 
-            onClick={() => {
-              setShowNotifications(!showNotifications);
-              setShowProfile(false);
-            }}
-            className="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center w-8 h-8 rounded-full hover:bg-surface-container-high cursor-pointer relative"
-          >
-            <span className="material-symbols-outlined">notifications</span>
-            <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
-          </button>
-          
-          {showNotifications && (
-            <>
-              <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)}></div>
-              <div className="absolute right-0 mt-2 w-64 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg p-4 z-50">
-                <h4 className="font-label-md font-bold mb-2 text-on-surface">Notifications</h4>
-                <p className="font-body-sm text-on-surface-variant">System error rate exceeded 5% threshold in the last 10 minutes.</p>
-              </div>
-            </>
-          )}
-        </div>
-
-        <Link 
-          href="/superadmin/settings"
-          className="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center w-8 h-8 rounded-full hover:bg-surface-container-high cursor-pointer"
-        >
-          <span className="material-symbols-outlined">settings</span>
-        </Link>
-        
         {/* Profile */}
         <div className="relative">
           <button 
             onClick={() => {
               setShowProfile(!showProfile);
-              setShowNotifications(false);
             }}
             className="w-8 h-8 rounded-full bg-primary text-on-primary overflow-hidden cursor-pointer flex-shrink-0 flex justify-center items-center font-bold text-sm ml-2 hover:opacity-90 border border-outline-variant"
           >
