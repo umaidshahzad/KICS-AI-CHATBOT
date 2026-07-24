@@ -1,0 +1,46 @@
+[
+  {
+    "id": "u-1",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "user",
+    "apiLimit": 100000,
+    "tokensUsed": 45000,
+    "apiUsed": 8000,
+    "createdAt": "2026-06-24T10:00:00.000Z",
+    "status": "active"
+  },
+  {
+    "id": "u-2",
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "role": "user",
+    "apiLimit": 50000,
+    "tokensUsed": 49000,
+    "apiUsed": 5000,
+    "createdAt": "2026-07-09T10:00:00.000Z",
+    "status": "active"
+  },
+  {
+    "id": "u-1784888428971",
+    "name": "muathir",
+    "email": "mutahur@gmail.com",
+    "role": "user",
+    "apiLimit": 100000,
+    "tokensUsed": 0,
+    "apiUsed": 0,
+    "createdAt": "2026-07-24T10:20:28.971Z",
+    "status": "active"
+  },
+  {
+    "id": "u-1784893642404",
+    "name": "Mutahir",
+    "email": "mutahir@gmail.com",
+    "role": "Admin",
+    "apiLimit": 100000,
+    "tokensUsed": 0,
+    "apiUsed": 0,
+    "createdAt": "2026-07-24T11:47:22.404Z",
+    "status": "Active"
+  }
+]
