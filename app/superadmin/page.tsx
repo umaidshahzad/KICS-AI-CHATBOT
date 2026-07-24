@@ -1,6 +1,9 @@
 "use client";
 
 import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip } from 'recharts';
+import { useState } from 'react';
+import Link from 'next/link';
+import { ExportService } from '../../services/export.service';
 
 const healthData = [
   { time: '00:00', primary: 40, secondary: 70 },
@@ -11,9 +14,6 @@ const healthData = [
   { time: '20:00', primary: 80, secondary: 55 },
   { time: '24:00', primary: 45, secondary: 70 },
 ];
-
-import { useState } from 'react';
-import Link from 'next/link';
 
 export default function SuperAdminPlatformOverview() {
   const [showExportModal, setShowExportModal] = useState(false);
@@ -30,30 +30,42 @@ export default function SuperAdminPlatformOverview() {
       avgLatency: "124ms"
     };
     
-    let dataStr = "";
-    let fileName = "platform_report";
-    let mimeType = "";
+    const headers = ["Generated At", "Report Type", "Status", "Uptime", "Active Nodes", "Avg Latency"];
+    const row = [
+      mockReportData.generatedAt,
+      mockReportData.reportType,
+      mockReportData.status,
+      mockReportData.uptime,
+      mockReportData.activeNodes,
+      mockReportData.avgLatency
+    ];
 
     if (exportFormat === 'json') {
-      dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mockReportData, null, 2));
-      fileName += ".json";
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mockReportData, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", "platform_report.json");
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
     } else if (exportFormat === 'csv') {
-      const csv = `Generated At,Report Type,Status,Uptime,Active Nodes,Avg Latency\n${mockReportData.generatedAt},${mockReportData.reportType},${mockReportData.status},${mockReportData.uptime},${mockReportData.activeNodes},${mockReportData.avgLatency}`;
-      dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
-      fileName += ".csv";
+      ExportService.generateCSV('platform_report', headers, [row]);
     } else if (exportFormat === 'pdf') {
-      // Mock PDF (will just be text in a file for this demo)
-      const pdfText = `PLATFORM REPORT\nGenerated At: ${mockReportData.generatedAt}\nType: ${mockReportData.reportType}\nStatus: ${mockReportData.status}\nUptime: ${mockReportData.uptime}\nNodes: ${mockReportData.activeNodes}\nLatency: ${mockReportData.avgLatency}`;
-      dataStr = "data:application/pdf;charset=utf-8," + encodeURIComponent(pdfText);
-      fileName += ".pdf";
+      ExportService.generatePDF(
+        'platform_report',
+        'PLATFORM HEALTH REPORT',
+        'Global Infrastructure Overview',
+        headers,
+        [row],
+        {
+          "System Uptime": "99.98%",
+          "Active API Nodes": "24/24",
+          "Avg Global Latency": "124ms",
+          "Daily Request Vol": "14.2B"
+        }
+      );
     }
-
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", fileName);
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+    
     setShowExportModal(false);
   };
   

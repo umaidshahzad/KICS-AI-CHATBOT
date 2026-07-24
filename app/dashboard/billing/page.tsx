@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { UserService } from '../../../services/user.service';
+import { ExportService } from '../../../services/export.service';
 
 export default function BillingPage() {
   const [billing, setBilling] = useState<any>(null);
@@ -57,6 +58,7 @@ export default function BillingPage() {
               <th className="p-4 text-xs uppercase font-bold text-on-surface-variant">Date</th>
               <th className="p-4 text-xs uppercase font-bold text-on-surface-variant">Amount</th>
               <th className="p-4 text-xs uppercase font-bold text-on-surface-variant">Status</th>
+              <th className="p-4 text-xs uppercase font-bold text-on-surface-variant text-right">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -67,6 +69,27 @@ export default function BillingPage() {
                 <td className="p-4">${inv.amount}</td>
                 <td className="p-4">
                   <span className="px-2 py-1 bg-green-100 text-green-800 rounded-lg text-xs font-bold">{inv.status}</span>
+                </td>
+                <td className="p-4 text-right">
+                  <button 
+                    onClick={() => {
+                      ExportService.generatePDF(
+                        `Invoice_${inv.id}`,
+                        'BILLING INVOICE',
+                        `Invoice ID: ${inv.id} - ${inv.date}`,
+                        ['Description', 'Amount', 'Status'],
+                        [['API Usage Plan', `$${inv.amount}`, inv.status]],
+                        {
+                          "Total Due": `$${inv.amount}`,
+                          "Status": inv.status
+                        }
+                      );
+                    }}
+                    className="text-primary hover:bg-surface-container p-2 rounded-full transition-colors flex items-center justify-center ml-auto"
+                    title="Download PDF"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">download</span>
+                  </button>
                 </td>
               </tr>
             ))}
