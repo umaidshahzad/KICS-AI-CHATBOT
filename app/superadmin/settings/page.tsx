@@ -56,14 +56,14 @@ export default function SuperAdminSettingsPage() {
                   </div>
                 </div>
 
-                <div>
+                {/* <div>
                   <label className="block font-label-sm font-bold text-on-surface-variant uppercase tracking-wider mb-2">System Theme Default</label>
                   <select className="w-full md:w-1/2 bg-surface-container border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:border-primary transition-colors">
                     <option>System Default (Auto)</option>
                     <option>Light Mode</option>
                     <option>Dark Mode</option>
                   </select>
-                </div>
+                </div> */}
               </div>
             )}
 
