@@ -93,6 +93,13 @@ export default function SuperAdminAdminsPage() {
     setEditAdmin(null);
   };
 
+  const handleDeleteAdmin = (id: string) => {
+    if (confirm('Are you sure you want to delete this admin?')) {
+      setAdmins(admins.filter(admin => admin.id !== id));
+      // In a real app, make a DELETE request here
+    }
+  };
+
   const displayedAdmins = admins.filter(admin => {
     if (activeFilter === 'active') return admin.status === 'active' || admin.status === 'Active';
     return true;
@@ -202,6 +209,13 @@ export default function SuperAdminAdminsPage() {
                         title={admin.status === 'Active' || admin.status === 'active' ? 'Deactivate' : 'Activate'}
                       >
                         <span className="material-symbols-outlined text-[20px]">{admin.status === 'Active' || admin.status === 'active' ? 'block' : 'check_circle'}</span>
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteAdmin(admin.id)}
+                        className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-md transition-colors ml-1" 
+                        title="Delete Admin"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">delete</span>
                       </button>
                     </div>
                   </td>
