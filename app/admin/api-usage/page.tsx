@@ -14,6 +14,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { AdminService } from '../../../services/admin.service';
+import { ExportService } from '../../../services/export.service';
 
 ChartJS.register(
   CategoryScale,
@@ -34,11 +35,32 @@ export default function ApiUsagePage() {
 
   const handleExport = () => {
     setExporting(true);
-    setTimeout(() => {
-      setExporting(false);
+    try {
+      const headers = ["User ID", "Name", "Email", "Role", "API Used", "Tokens Used", "Status"];
+      const rows = users.map(u => [
+        u.id,
+        u.name,
+        u.email,
+        u.role,
+        u.apiUsed,
+        u.tokensUsed,
+        u.status
+      ]);
+
+      ExportService.generatePDF(
+        'api_usage_report',
+        'API USAGE REPORT',
+        'Global User Consumption',
+        headers,
+        rows
+      );
       setExportSuccess(true);
+    } catch (e) {
+      console.error("Export failed", e);
+    } finally {
+      setExporting(false);
       setTimeout(() => setExportSuccess(false), 3000);
-    }, 1500);
+    }
   };
 
   useEffect(() => {
