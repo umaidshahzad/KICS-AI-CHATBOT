@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function ModelsManagementPage() {
   const [models, setModels] = useState([
@@ -136,52 +137,22 @@ export default function ModelsManagementPage() {
             )}
 
             <div className={`mt-auto flex gap-3 pt-4 border-t border-outline-variant/50 ${(model.status === 'Degraded' || model.status === 'Disabled') ? 'pl-2' : ''}`}>
-              {model.status === 'Active' ? (
-                <>
-                  <button 
-                    onClick={() => setModalContent({ title: `Configure ${model.name}`, message: 'Configuration options are locked for production models.' })}
-                    className="flex-1 py-2 text-center border border-outline-variant rounded-[8px] font-label-sm text-label-sm text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer"
-                  >
-                    Configure
-                  </button>
-                  <button 
-                    onClick={() => setModalContent({ title: `Logs: ${model.name}`, message: 'Fetching logs... No anomalies detected.' })}
-                    className="flex-1 py-2 text-center border border-outline-variant rounded-[8px] font-label-sm text-label-sm text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer"
-                  >
-                    View Logs
-                  </button>
-                </>
-              ) : model.status === 'Degraded' ? (
-                <>
-                  <button 
-                    onClick={() => setModalContent({ title: 'Diagnostics', message: 'VRAM is exhausted on Node 04 due to a memory leak in the attention heads.' })}
-                    className="flex-1 py-2 text-center border border-outline-variant rounded-[8px] font-label-sm text-label-sm text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer"
-                  >
-                    Run Diagnostics
-                  </button>
-                  <button 
-                    onClick={() => handleRestartNode(model.id)}
-                    className="flex-1 py-2 text-center bg-error text-on-error rounded-[8px] font-label-sm text-label-sm hover:bg-error/90 transition-colors cursor-pointer shadow-sm"
-                  >
-                    Restart Node
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button 
-                    disabled
-                    className="flex-1 py-2 text-center border border-outline-variant rounded-[8px] font-label-sm text-label-sm text-on-surface opacity-50 cursor-not-allowed"
-                  >
-                    Configure
-                  </button>
-                  <button 
-                    disabled
-                    className="flex-1 py-2 text-center border border-outline-variant rounded-[8px] font-label-sm text-label-sm text-on-surface opacity-50 cursor-not-allowed"
-                  >
-                    View Logs
-                  </button>
-                </>
-              )}
+              <Link 
+                href={`/admin/models/${model.id}`}
+                className={`flex-1 py-2 text-center rounded-[8px] font-label-sm text-label-sm transition-colors cursor-pointer ${
+                  model.status === 'Disabled' 
+                    ? 'border border-outline-variant text-on-surface opacity-50 pointer-events-none' 
+                    : 'bg-primary text-on-primary hover:bg-primary/90 shadow-sm'
+                }`}
+              >
+                View Analytics
+              </Link>
+              <button 
+                disabled
+                className="flex-1 py-2 text-center border border-outline-variant rounded-[8px] font-label-sm text-label-sm text-on-surface opacity-50 cursor-not-allowed"
+              >
+                API Settings
+              </button>
             </div>
           </div>
         ))}
