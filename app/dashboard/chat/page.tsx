@@ -65,15 +65,44 @@ export default function ChatPage() {
   return (
     <div className="flex-1 flex flex-col h-full relative">
       {/* Chat Feed Area */}
-      <div className="flex-1 overflow-y-auto pb-32 px-4 md:px-8">
-        <div className="max-w-[800px] mx-auto space-y-8 flex flex-col justify-end min-h-full py-8">
+      <div className="flex-1 overflow-y-auto pb-32 px-4 md:px-8 relative">
+        <div className="max-w-[800px] mx-auto space-y-8 flex flex-col min-h-full py-8">
+          
+          {/* Welcome Header */}
+          <div className="flex flex-col items-center justify-center text-center py-6 mb-4 border-b border-outline-variant/30">
+            <h1 className="font-headline-lg text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary mb-2">
+              Welcome to KICS ChatBot
+            </h1>
+            <p className="text-on-surface-variant font-body-md text-body-md max-w-lg">
+              Experience the power of our advanced models. Start a conversation, brainstorm ideas, or ask complex questions.
+            </p>
+          </div>
           
           {!activeSession?.messages.length && (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto bg-surface-container rounded-[8px] flex items-center justify-center mb-4">
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="w-16 h-16 bg-surface-container rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-outline-variant/30">
                 <span className="material-symbols-outlined text-[32px] text-primary">smart_toy</span>
               </div>
-              <h2 className="text-2xl font-bold text-on-background mb-2">How can I help you today?</h2>
+              <h2 className="text-2xl font-bold text-on-background mb-8">How can I help you today?</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
+                <button onClick={() => setInput('Help me plan a project.')} className="p-4 text-left border border-outline-variant rounded-xl hover:bg-surface-container-low hover:border-primary/50 transition-all group">
+                  <h3 className="font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">Plan a project</h3>
+                  <p className="text-sm text-on-surface-variant">Get a structured breakdown for your next big idea.</p>
+                </button>
+                <button onClick={() => setInput('Explain quantum computing to a 5 year old.')} className="p-4 text-left border border-outline-variant rounded-xl hover:bg-surface-container-low hover:border-primary/50 transition-all group">
+                  <h3 className="font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">Explain a concept</h3>
+                  <p className="text-sm text-on-surface-variant">Break down complex topics into simple terms.</p>
+                </button>
+                <button onClick={() => setInput('Write a professional email asking for a deadline extension.')} className="p-4 text-left border border-outline-variant rounded-xl hover:bg-surface-container-low hover:border-primary/50 transition-all group">
+                  <h3 className="font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">Draft an email</h3>
+                  <p className="text-sm text-on-surface-variant">Create professional correspondence quickly.</p>
+                </button>
+                <button onClick={() => setInput('Help me debug this error message: ')} className="p-4 text-left border border-outline-variant rounded-xl hover:bg-surface-container-low hover:border-primary/50 transition-all group">
+                  <h3 className="font-bold text-on-surface mb-1 group-hover:text-primary transition-colors">Debug code</h3>
+                  <p className="text-sm text-on-surface-variant">Paste your error message and get a solution.</p>
+                </button>
+              </div>
             </div>
           )}
 

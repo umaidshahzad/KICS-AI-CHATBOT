@@ -85,12 +85,7 @@ export function AdminSidebar() {
 
       {/* Footer Actions */}
       <div className="p-4 border-t border-outline-variant space-y-1">
-        <Link href="/dashboard/chat" className="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-tint/50 border border-transparent hover:border-outline-variant transition-colors duration-200 rounded-[8px] cursor-pointer active:opacity-80">
-          <div className="w-6 h-6 rounded-[8px] bg-primary flex items-center justify-center text-white font-bold">
-            <span className="material-symbols-outlined text-[16px]">smart_toy</span>
-          </div>
-          <span className="font-body-sm text-body-sm flex-1 truncate">Go to User Chat</span>
-        </Link>
+
         <button onClick={() => signOut({ callbackUrl: '/login' })} className="w-full flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-tint/50 border border-transparent hover:border-outline-variant transition-colors duration-200 rounded-[8px] cursor-pointer active:opacity-80">
           <span className="material-symbols-outlined">logout</span>
           <span className="font-body-sm text-body-sm">Sign Out</span>
