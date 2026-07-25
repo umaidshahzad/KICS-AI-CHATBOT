@@ -23,20 +23,20 @@ export default function SuperAdminPlatformOverview() {
     e.preventDefault();
     const mockReportData = {
       generatedAt: new Date().toISOString(),
-      reportType: "System Health Metrics",
+      reportType: "API Provider Health Metrics",
       status: "Healthy",
       uptime: "99.98%",
-      activeNodes: 24,
-      avgLatency: "124ms"
+      activeProviders: 4,
+      avgLatency: "210ms"
     };
     
-    const headers = ["Generated At", "Report Type", "Status", "Uptime", "Active Nodes", "Avg Latency"];
+    const headers = ["Generated At", "Report Type", "Status", "Uptime", "Active Providers", "Avg Latency"];
     const row = [
       mockReportData.generatedAt,
       mockReportData.reportType,
       mockReportData.status,
       mockReportData.uptime,
-      mockReportData.activeNodes,
+      mockReportData.activeProviders,
       mockReportData.avgLatency
     ];
 
@@ -54,13 +54,13 @@ export default function SuperAdminPlatformOverview() {
       ExportService.generatePDF(
         'platform_report',
         'PLATFORM HEALTH REPORT',
-        'Global Infrastructure Overview',
+        'Global API Provider Overview',
         headers,
         [row],
         {
-          "System Uptime": "99.98%",
-          "Active API Nodes": "24/24",
-          "Avg Global Latency": "124ms",
+          "Platform Uptime": "99.98%",
+          "Active Providers": "4/4",
+          "Avg Global Latency": "210ms",
           "Daily Request Vol": "14.2B"
         }
       );
@@ -75,7 +75,7 @@ export default function SuperAdminPlatformOverview() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="font-headline-xl text-4xl font-bold text-on-background">Platform Overview</h2>
-          <p className="font-body-md text-on-surface-variant mt-1">Real-time system health and global infrastructure oversight.</p>
+          <p className="font-body-md text-on-surface-variant mt-1">Real-time API provider health and platform usage oversight.</p>
         </div>
         <div className="flex gap-2">
           <button 
@@ -85,10 +85,10 @@ export default function SuperAdminPlatformOverview() {
             EXPORT REPORT
           </button>
           <Link 
-            href="/superadmin/deployments/new"
+            href="/superadmin/models"
             className="px-4 py-2 bg-primary text-on-primary rounded-lg font-label-md hover:bg-primary/90 transition-colors shadow-sm flex items-center justify-center"
           >
-            NEW DEPLOYMENT
+            ADD PROVIDER KEY
           </Link>
         </div>
       </div>
@@ -103,16 +103,16 @@ export default function SuperAdminPlatformOverview() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6 border-b border-outline-variant pb-6">
             <div>
-              <p className="font-label-md text-on-surface-variant uppercase tracking-wider text-xs">SYSTEM UPTIME</p>
+              <p className="font-label-md text-on-surface-variant uppercase tracking-wider text-xs">PLATFORM UPTIME</p>
               <p className="font-headline-lg text-3xl font-bold text-primary mt-2">99.98%</p>
             </div>
             <div>
-              <p className="font-label-md text-on-surface-variant uppercase tracking-wider text-xs">ACTIVE API NODES</p>
-              <p className="font-headline-lg text-3xl font-bold text-on-surface mt-2">24/24</p>
+              <p className="font-label-md text-on-surface-variant uppercase tracking-wider text-xs">ACTIVE PROVIDERS</p>
+              <p className="font-headline-lg text-3xl font-bold text-on-surface mt-2">4/4</p>
             </div>
             <div>
               <p className="font-label-md text-on-surface-variant uppercase tracking-wider text-xs">AVG GLOBAL LATENCY</p>
-              <p className="font-headline-lg text-3xl font-bold text-on-surface mt-2">124ms</p>
+              <p className="font-headline-lg text-3xl font-bold text-on-surface mt-2">210ms</p>
             </div>
             <div>
               <p className="font-label-md text-on-surface-variant uppercase tracking-wider text-xs">DAILY REQUEST VOL</p>
@@ -143,15 +143,15 @@ export default function SuperAdminPlatformOverview() {
         {/* System Services Health Quick Access (Spans 4 cols) */}
         <div className="col-span-1 md:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl p-6 flex flex-col shadow-sm">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-headline-md text-2xl font-bold text-on-surface">System Services</h3>
-            <button className="font-label-md text-primary hover:text-primary/80 uppercase tracking-wider text-xs font-bold">MANAGE</button>
+            <h3 className="font-headline-md text-2xl font-bold text-on-surface">Connected Providers</h3>
+            <Link href="/superadmin/models" className="font-label-md text-primary hover:text-primary/80 uppercase tracking-wider text-xs font-bold">MANAGE</Link>
           </div>
           <div className="space-y-4 flex-1">
             {[
-              { name: 'API Gateway', status: 'Operational', color: 'bg-green-600' },
-              { name: 'Inference Engine', status: 'Optimized', color: 'bg-green-600' },
-              { name: 'Primary Database', status: 'Normal', color: 'bg-green-600' },
-              { name: 'Asset Storage', status: 'Normal', color: 'bg-green-600' }
+              { name: 'OpenAI', status: 'Operational', color: 'bg-green-600' },
+              { name: 'Anthropic', status: 'Operational', color: 'bg-green-600' },
+              { name: 'Google Gemini', status: 'Degraded', color: 'bg-amber-500' },
+              { name: 'Mistral AI', status: 'Operational', color: 'bg-green-600' }
             ].map(service => (
               <div key={service.name} className="p-4 border border-outline-variant rounded-lg hover:border-primary/30 transition-colors cursor-pointer group bg-surface">
                 <div className="flex justify-between items-center mb-2">
@@ -169,7 +169,7 @@ export default function SuperAdminPlatformOverview() {
         {/* Global Infrastructure Status Table (Full Width) */}
         <div className="col-span-1 md:col-span-12 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden mt-2">
           <div className="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
-            <h3 className="font-headline-md text-2xl font-bold text-on-surface">Global Infrastructure Status</h3>
+            <h3 className="font-headline-md text-2xl font-bold text-on-surface">Provider API Status</h3>
             <button className="px-4 py-2 border border-outline-variant text-on-surface rounded-lg font-label-md hover:border-primary-container hover:text-primary transition-colors flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">filter_list</span> FILTER
             </button>
@@ -178,23 +178,23 @@ export default function SuperAdminPlatformOverview() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-outline-variant bg-surface">
-                  <th className="p-4 font-label-md text-on-surface-variant font-bold text-xs tracking-wider">REGION</th>
+                  <th className="p-4 font-label-md text-on-surface-variant font-bold text-xs tracking-wider">PROVIDER</th>
                   <th className="p-4 font-label-md text-on-surface-variant font-bold text-xs tracking-wider">STATUS</th>
-                  <th className="p-4 font-label-md text-on-surface-variant font-bold text-xs tracking-wider">ACTIVE NODES</th>
-                  <th className="p-4 font-label-md text-on-surface-variant font-bold text-xs tracking-wider">TRAFFIC LOAD</th>
+                  <th className="p-4 font-label-md text-on-surface-variant font-bold text-xs tracking-wider">MODELS AVAILABLE</th>
+                  <th className="p-4 font-label-md text-on-surface-variant font-bold text-xs tracking-wider">API CALLS</th>
                   <th className="p-4 font-label-md text-on-surface-variant font-bold text-xs tracking-wider text-right">LATENCY</th>
                 </tr>
               </thead>
               <tbody className="font-body-sm text-on-surface">
                 {[
-                  { region: 'North America', locations: 'US-East, US-West', status: 'Healthy', nodes: '12/12', traffic: '6.4B', latency: '42ms', color: 'text-green-600', bg: 'bg-green-100' },
-                  { region: 'Europe', locations: 'EU-Central, EU-West', status: 'Healthy', nodes: '8/8', traffic: '4.1B', latency: '58ms', color: 'text-green-600', bg: 'bg-green-100' },
-                  { region: 'Asia Pacific', locations: 'AP-East, AP-South', status: 'Warning', nodes: '3/4', traffic: '3.7B', latency: '185ms', color: 'text-amber-600', bg: 'bg-amber-100' }
+                  { provider: 'OpenAI', models: 'GPT-4o, GPT-3.5', status: 'Healthy', activeModels: '6', traffic: '6.4B', latency: '240ms', color: 'text-green-600', bg: 'bg-green-100' },
+                  { provider: 'Anthropic', models: 'Claude 3 Opus, Sonnet', status: 'Healthy', activeModels: '4', traffic: '4.1B', latency: '180ms', color: 'text-green-600', bg: 'bg-green-100' },
+                  { provider: 'Google Gemini', models: 'Gemini 1.5 Pro', status: 'Warning', activeModels: '3', traffic: '3.7B', latency: '450ms', color: 'text-amber-600', bg: 'bg-amber-100' }
                 ].map((row, i) => (
                   <tr key={i} className="border-b border-outline-variant hover:bg-surface-container-low transition-colors group">
                     <td className="p-4">
-                      <p className="font-bold text-base">{row.region}</p>
-                      <p className="text-on-surface-variant text-xs mt-1">{row.locations}</p>
+                      <p className="font-bold text-base">{row.provider}</p>
+                      <p className="text-on-surface-variant text-xs mt-1">{row.models}</p>
                     </td>
                     <td className="p-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${row.bg} ${row.color}`}>
@@ -202,7 +202,7 @@ export default function SuperAdminPlatformOverview() {
                         {row.status}
                       </span>
                     </td>
-                    <td className="p-4 font-code-sm">{row.nodes}</td>
+                    <td className="p-4 font-code-sm">{row.activeModels} Models</td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
                         <span className="font-code-sm w-12">{row.traffic}</span>
