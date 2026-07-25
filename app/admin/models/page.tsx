@@ -69,12 +69,6 @@ export default function ModelsManagementPage() {
           >
             <span className={`material-symbols-outlined ${isRefreshing ? 'animate-spin' : ''}`}>sync</span> {isRefreshing ? 'Refreshing...' : 'Refresh Status'}
           </button>
-          <button 
-            onClick={() => setModalContent({ title: 'Deploy Model', message: 'Model deployment interface is coming in v2.0.' })}
-            className="px-6 py-3 bg-primary text-on-primary rounded-[8px] font-label-md hover:bg-surface-tint transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
-          >
-            <span className="material-symbols-outlined">add</span> Deploy Model
-          </button>
         </div>
       </div>
 
