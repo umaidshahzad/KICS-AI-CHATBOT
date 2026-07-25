@@ -89,6 +89,35 @@ export default function UserManagementPage() {
     }
   };
 
+  const handleDeleteUser = async (id: string) => {
+    if (confirm("Are you sure you want to delete this user?")) {
+      try {
+        const res = await fetch(`/api/mock/admin/users?id=${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          setUsers(users.filter(u => u.id !== id));
+        } else {
+          alert("Failed to delete user.");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
+  const toggleUserStatus = async (user: any) => {
+    const newStatus = user.status === 'restricted' ? 'active' : 'restricted';
+    const action = newStatus === 'restricted' ? 'restrict' : 'unrestrict';
+    if (confirm(`Are you sure you want to ${action} ${user.name}?`)) {
+      try {
+        await AdminService.updateUserStatus(user.id, newStatus);
+        setUsers(users.map(u => u.id === user.id ? { ...u, status: newStatus } : u));
+      } catch (err) {
+        console.error("Failed to update status", err);
+        alert(`Failed to ${action} user.`);
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -150,8 +179,8 @@ export default function UserManagementPage() {
             >
               <option value="all">All Roles</option>
               <option value="user">User</option>
-              <option value="admin">Admin</option>
-              <option value="superadmin">Superadmin</option>
+              {/* <option value="admin">Admin</option>
+              <option value="superadmin">Superadmin</option> */}
             </select>
             <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant pointer-events-none">expand_more</span>
           </div>
@@ -199,8 +228,8 @@ export default function UserManagementPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1.5">
-                        <div className={`w-2 h-2 rounded-full ${u.status === 'active' ? 'bg-[#4CAF50]' : 'bg-outline'}`}></div>
-                        <span className="text-on-surface capitalize">{u.status}</span>
+                        <div className={`w-2 h-2 rounded-full ${u.status === 'active' ? 'bg-[#4CAF50]' : u.status === 'restricted' ? 'bg-error' : 'bg-outline'}`}></div>
+                        <span className={`capitalize ${u.status === 'restricted' ? 'text-error font-bold' : 'text-on-surface'}`}>{u.status}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -221,6 +250,15 @@ export default function UserManagementPage() {
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2 transition-opacity">
                         <button 
+                          onClick={() => toggleUserStatus(u)}
+                          className={`${u.status === 'restricted' ? 'text-secondary hover:bg-secondary/10' : 'text-error hover:bg-error-container'} p-1.5 rounded-full transition-colors cursor-pointer`}
+                          title={u.status === 'restricted' ? "Unrestrict User" : "Restrict User"}
+                        >
+                          <span className="material-symbols-outlined text-[18px]">
+                            {u.status === 'restricted' ? 'lock_open' : 'block'}
+                          </span>
+                        </button>
+                        <button 
                           onClick={() => openEditModal(u)}
                           className="text-on-surface-variant hover:text-primary p-1.5 rounded-full hover:bg-surface-container-high transition-colors cursor-pointer"
                           title="Edit User"
@@ -228,21 +266,7 @@ export default function UserManagementPage() {
                           <span className="material-symbols-outlined text-[18px]">edit</span>
                         </button>
                         <button 
-                          onClick={async () => {
-                            if (confirm(`Are you sure you want to delete ${u.name}?`)) {
-                              try {
-                                const res = await fetch(`/api/mock/admin/users?id=${u.id}`, { method: 'DELETE' });
-                                if (res.ok) {
-                                  setUsers(users.filter(user => user.id !== u.id));
-                                } else {
-                                  alert('Failed to delete user');
-                                }
-                              } catch (err) {
-                                console.error(err);
-                                alert('Error deleting user');
-                              }
-                            }
-                          }}
+                          onClick={() => handleDeleteUser(u.id)}
                           className="text-error hover:bg-error-container p-1.5 rounded-full transition-colors cursor-pointer" title="Delete User"
                         >
                           <span className="material-symbols-outlined text-[18px]">delete</span>
