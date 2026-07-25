@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,15 +99,26 @@ export default function LoginPage() {
 
             <div className="flex flex-col gap-2">
               <label className="font-label-sm text-on-surface-variant uppercase tracking-wider text-xs font-bold" htmlFor="password">Password</label>
-              <input 
-                id="password" 
-                type="password" 
-                required 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-surface-container border-none rounded-xl px-4 py-3 font-body-md text-on-surface focus:ring-2 focus:ring-primary/10 outline-none" 
-                placeholder="••••••••" 
-              />
+              <div className="relative">
+                <input 
+                  id="password" 
+                  type={showPassword ? "text" : "password"} 
+                  required 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-surface-container border-none rounded-xl px-4 py-3 pr-10 font-body-md text-on-surface focus:ring-2 focus:ring-primary/10 outline-none" 
+                  placeholder="••••••••" 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors focus:outline-none"
+                >
+                  <span className="material-symbols-outlined text-[20px]">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
+              </div>
             </div>
 
             <button disabled={isLoading} type="submit" className="w-full bg-secondary-container text-on-secondary-container font-bold py-3 mt-4 rounded-xl hover:bg-secondary-fixed transition-all shadow-md active:scale-[0.98]">
