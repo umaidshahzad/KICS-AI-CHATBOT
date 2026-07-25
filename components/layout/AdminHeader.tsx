@@ -125,12 +125,7 @@ export function AdminHeader() {
           >
             <span className="material-symbols-outlined">notifications</span>
           </Link>
-          <Link 
-            href="/admin/settings"
-            className="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center w-8 h-8 rounded-full hover:bg-surface-container-high cursor-pointer"
-          >
-            <span className="material-symbols-outlined">settings</span>
-          </Link>
+
           
           {/* Actions */}
           <button 
