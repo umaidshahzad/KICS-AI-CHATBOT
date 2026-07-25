@@ -2,99 +2,87 @@
 
 import { useEffect, useState } from 'react';
 import { UserService } from '../../../services/user.service';
-import { ExportService } from '../../../services/export.service';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-export default function BillingPage() {
-  const [billing, setBilling] = useState<any>(null);
+export default function UsagePage() {
+  const [usageData, setUsageData] = useState<any>(null);
 
   useEffect(() => {
-    async function loadBilling() {
+    async function loadUsage() {
       try {
-        const data = await UserService.fetchBilling();
-        setBilling(data);
+        const data = await UserService.fetchBilling(); // We can keep using fetchBilling from the service for now
+        setUsageData(data);
       } catch (err) {
         console.error(err);
       }
     }
-    loadBilling();
+    loadUsage();
   }, []);
 
-  if (!billing) return <div className="p-8">Loading billing info...</div>;
+  if (!usageData) return <div className="p-8 text-on-background">Loading usage info...</div>;
 
   return (
-    <div className="p-4 md:p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Usage & Billing</h1>
+    <div className="p-4 md:p-8 max-w-5xl mx-auto">
+      <h1 className="text-3xl font-bold mb-8 text-on-background">Activity Analytics</h1>
       
       <div className="grid md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6">
-          <h3 className="text-sm font-bold text-on-surface-variant uppercase mb-4">Current Plan</h3>
-          <div className="text-4xl font-bold text-primary mb-2">{billing.currentPlan}</div>
-          <p className="text-on-surface-variant mb-4">Status: <span className="text-green-600 font-bold">{billing.status}</span></p>
-          <button className="w-full bg-primary text-white font-bold py-2 rounded-lg">Upgrade Plan</button>
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0"></div>
+          <h3 className="text-sm font-bold text-on-surface-variant uppercase mb-4 relative z-10">Assigned Model</h3>
+          <div className="text-3xl md:text-4xl font-bold text-primary mb-2 relative z-10 flex items-center gap-3">
+            <span className="material-symbols-outlined text-[32px] md:text-[40px]">memory</span>
+            {usageData.assignedModel}
+          </div>
+          <p className="text-on-surface-variant mb-4 relative z-10">Status: <span className="text-green-600 font-bold">{usageData.status}</span></p>
         </div>
 
         <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6">
-          <h3 className="text-sm font-bold text-on-surface-variant uppercase mb-4">API Usage</h3>
+          <h3 className="text-sm font-bold text-on-surface-variant uppercase mb-4">Total Tokens Used</h3>
           <div className="flex justify-between items-end mb-2">
-            <span className="text-2xl font-bold">{billing.apiUsage.used.toLocaleString()}</span>
-            <span className="text-on-surface-variant">/ {billing.apiUsage.limit.toLocaleString()} tokens</span>
+            <span className="text-2xl font-bold text-on-background">{usageData.apiUsage.used.toLocaleString()}</span>
+            <span className="text-on-surface-variant">/ {usageData.apiUsage.limit.toLocaleString()} tokens</span>
           </div>
           <div className="w-full bg-surface-container h-4 rounded-full overflow-hidden mb-4">
             <div 
-              className="h-full bg-primary" 
-              style={{ width: `${billing.apiUsage.percentage}%` }}
+              className={`h-full transition-all duration-1000 ${usageData.apiUsage.percentage > 90 ? 'bg-error' : 'bg-primary'}`}
+              style={{ width: `${usageData.apiUsage.percentage}%` }}
             ></div>
           </div>
-          <p className="text-sm text-on-surface-variant">Resets on {new Date(billing.nextBillingDate).toLocaleDateString()}</p>
+          <p className="text-sm text-on-surface-variant">
+            {usageData.apiUsage.percentage >= 100 
+              ? <span className="text-error font-bold">Limit reached. Contact admin for more tokens.</span>
+              : 'Keep an eye on your usage limits.'}
+          </p>
         </div>
       </div>
 
-      <h2 className="text-xl font-bold mb-4">Recent Invoices</h2>
-      <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-surface-container">
-            <tr>
-              <th className="p-4 text-xs uppercase font-bold text-on-surface-variant">Invoice ID</th>
-              <th className="p-4 text-xs uppercase font-bold text-on-surface-variant">Date</th>
-              <th className="p-4 text-xs uppercase font-bold text-on-surface-variant">Amount</th>
-              <th className="p-4 text-xs uppercase font-bold text-on-surface-variant">Status</th>
-              <th className="p-4 text-xs uppercase font-bold text-on-surface-variant text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {billing.recentInvoices.map((inv: any) => (
-              <tr key={inv.id} className="border-b border-outline-variant last:border-0">
-                <td className="p-4 font-bold">{inv.id}</td>
-                <td className="p-4">{inv.date}</td>
-                <td className="p-4">${inv.amount}</td>
-                <td className="p-4">
-                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded-lg text-xs font-bold">{inv.status}</span>
-                </td>
-                <td className="p-4 text-right">
-                  <button 
-                    onClick={() => {
-                      ExportService.generatePDF(
-                        `Invoice_${inv.id}`,
-                        'BILLING INVOICE',
-                        `Invoice ID: ${inv.id} - ${inv.date}`,
-                        ['Description', 'Amount', 'Status'],
-                        [['API Usage Plan', `$${inv.amount}`, inv.status]],
-                        {
-                          "Total Due": `$${inv.amount}`,
-                          "Status": inv.status
-                        }
-                      );
-                    }}
-                    className="text-primary hover:bg-surface-container p-2 rounded-full transition-colors flex items-center justify-center ml-auto"
-                    title="Download PDF"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">download</span>
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <h2 className="text-xl font-bold mb-4 text-on-background">7-Day Usage History</h2>
+      <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 h-[400px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={usageData.dailyUsage} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorTokens" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="date" stroke="var(--color-on-surface-variant)" fontSize={12} tickLine={false} axisLine={false} />
+            <YAxis stroke="var(--color-on-surface-variant)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val / 1000}k`} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-outline-variant)" opacity={0.3} />
+            <Tooltip 
+              contentStyle={{ backgroundColor: 'var(--color-surface-container)', borderColor: 'var(--color-outline-variant)', borderRadius: '8px', color: 'var(--color-on-background)' }}
+              itemStyle={{ color: 'var(--color-primary)' }}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="tokens" 
+              stroke="var(--color-primary)" 
+              strokeWidth={3}
+              fillOpacity={1} 
+              fill="url(#colorTokens)" 
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
