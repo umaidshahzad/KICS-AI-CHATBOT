@@ -53,6 +53,13 @@ export default function SuperAdminModelsPage() {
     icon: 'memory'
   });
 
+  const [visibleKeys, setVisibleKeys] = useState<Record<number, boolean>>({});
+  const [showNewKey, setShowNewKey] = useState(false);
+
+  const toggleKeyVisibility = (id: number) => {
+    setVisibleKeys(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
   const handleAddModel = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newModel.name || !newModel.endpoint) return;
@@ -188,14 +195,26 @@ export default function SuperAdminModelsPage() {
               
               <div>
                 <label className="block font-label-sm text-xs font-bold text-on-surface-variant mb-1.5">API Key</label>
-                <input 
-                  type="password" 
-                  value={model.endpoint}
-                  onChange={e => updateModel(model.id, 'endpoint', e.target.value)}
-                  disabled={!model.isActive}
-                  placeholder="sk-..."
-                  className="w-full bg-surface-container border border-outline-variant focus:border-primary rounded-lg px-4 py-2 font-body-md text-primary font-mono text-sm transition-all truncate outline-none disabled:opacity-50" 
-                />
+                <div className="relative">
+                  <input 
+                    type={visibleKeys[model.id] ? "text" : "password"} 
+                    value={model.endpoint}
+                    onChange={e => updateModel(model.id, 'endpoint', e.target.value)}
+                    disabled={!model.isActive}
+                    placeholder="sk-..."
+                    className="w-full bg-surface-container border border-outline-variant focus:border-primary rounded-lg px-4 py-2 pr-10 font-body-md text-primary font-mono text-sm transition-all truncate outline-none disabled:opacity-50" 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => toggleKeyVisibility(model.id)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors focus:outline-none"
+                    disabled={!model.isActive}
+                  >
+                    <span className="material-symbols-outlined text-[20px]">
+                      {visibleKeys[model.id] ? 'visibility_off' : 'visibility'}
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -231,14 +250,25 @@ export default function SuperAdminModelsPage() {
               
               <div>
                 <label className="block font-label-sm font-bold text-on-surface-variant uppercase tracking-wider mb-1">API Key</label>
-                <input 
-                  type="password" 
-                  required
-                  value={newModel.endpoint}
-                  onChange={e => setNewModel({...newModel, endpoint: e.target.value})}
-                  className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2 text-on-surface focus:outline-none focus:border-primary font-mono text-sm"
-                  placeholder="sk-..."
-                />
+                <div className="relative">
+                  <input 
+                    type={showNewKey ? "text" : "password"}
+                    required
+                    value={newModel.endpoint}
+                    onChange={e => setNewModel({...newModel, endpoint: e.target.value})}
+                    className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2 pr-10 text-on-surface focus:outline-none focus:border-primary font-mono text-sm"
+                    placeholder="sk-..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewKey(!showNewKey)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors focus:outline-none"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">
+                      {showNewKey ? 'visibility_off' : 'visibility'}
+                    </span>
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
