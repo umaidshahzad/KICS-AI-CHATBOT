@@ -18,6 +18,7 @@ export function Sidebar() {
   const { sessions, activeSessionId } = useSelector((state: RootState) => state.chat);
   
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const isActive = (path: string) => pathname === path;
 
@@ -68,27 +69,57 @@ export function Sidebar() {
           <span className="material-symbols-outlined text-[18px]">add</span>
           <span className="font-body-sm text-body-sm font-semibold">New Chat</span>
         </button>
-        <div className="mt-4 relative">
+        <div className="mt-4 relative z-50">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
           <input 
-            className="w-full bg-surface-container border border-outline-variant rounded-[8px] pl-9 pr-3 py-2 text-body-sm font-body-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-on-surface-variant" 
+            className="w-full bg-surface-container border border-outline-variant rounded-[8px] pl-9 pr-3 py-2 text-body-sm font-body-sm text-on-surface dark:text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-on-surface-variant" 
             placeholder="Search chats..." 
             type="text" 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
           />
+          
+          {/* Floating Search Suggestions */}
+          {isSearchFocused && searchQuery && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-surface-container-high dark:bg-surface-container-highest border border-outline-variant rounded-[8px] shadow-lg max-h-60 overflow-y-auto z-50">
+              {sessions.filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 ? (
+                sessions
+                  .filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase()))
+                  .map(session => (
+                    <button
+                      key={session.id}
+                      onClick={() => {
+                        dispatch(setActiveSession(session.id));
+                        router.push('/dashboard/chat');
+                        setSearchQuery('');
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-surface-container-highest dark:hover:bg-surface-tint/20 flex items-center gap-2 border-b border-outline-variant/30 last:border-0"
+                    >
+                      <span className="material-symbols-outlined text-[16px] text-on-surface-variant">chat_bubble_outline</span>
+                      <span className="truncate text-sm text-on-surface dark:text-white">{session.title}</span>
+                    </button>
+                  ))
+              ) : (
+                <div className="px-4 py-3 text-sm text-on-surface-variant italic text-center">No matching chats</div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Navigation Tabs */}
       <nav className="flex-1 overflow-y-auto hide-scrollbar py-2">
         <div className="px-2 space-y-1 mb-6">
-          <div className="px-4 py-2 text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-            Recent Chats
-          </div>
+          <Link href="/dashboard/chats" className="px-4 py-2 text-xs font-bold text-on-surface-variant dark:text-outline-variant hover:text-on-surface dark:hover:text-white transition-colors uppercase tracking-wider cursor-pointer block flex items-center justify-between group">
+            <span>Recent Chats</span>
+            <span className="material-symbols-outlined text-[14px] opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+          </Link>
           
           {sessions
             .filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase()))
+            .slice(0, 3)
             .map(session => (
               <button
                 key={session.id}
@@ -110,7 +141,7 @@ export function Sidebar() {
         </div>
 
         <div className="px-2 space-y-1">
-          <div className="px-4 py-2 text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+          <div className="px-4 py-2 text-xs font-bold text-on-surface-variant dark:text-outline-variant uppercase tracking-wider">
             Dashboard
           </div>
           <Link href="/dashboard/billing" className={`flex items-center gap-3 px-4 py-3 rounded-[8px] cursor-pointer transition-all border-l-4 ${isActive('/dashboard/billing') ? 'bg-secondary-container text-on-secondary-container border-primary rounded-r-[8px]' : 'text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-tint/50 border-transparent hover:border-outline-variant dark:hover:border-outline'}`}>
