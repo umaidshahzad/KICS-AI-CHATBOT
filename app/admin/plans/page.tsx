@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 export default function SubscriptionPlansPage() {
-  const [currentPlan, setCurrentPlan] = useState('Pro');
+  const [currentPlan, setCurrentPlan] = useState('Free');
   
   // Modal State
   const [planModalOpen, setPlanModalOpen] = useState(false);
@@ -131,7 +131,7 @@ export default function SubscriptionPlansPage() {
           {currentPlan === 'Pro' ? (
             <button className="w-full py-2.5 bg-surface-container-high text-on-surface-variant border border-outline-variant rounded-[8px] font-medium mb-8 cursor-default" disabled>Manage Plan</button>
           ) : (
-            <button onClick={() => setCurrentPlan('Pro')} className="w-full py-2.5 border border-outline-variant text-primary rounded-[8px] font-medium hover:bg-surface-variant transition-colors mb-8 cursor-pointer">Upgrade to Pro</button>
+            <button disabled className="w-full py-2.5 bg-surface-container-high text-on-surface-variant border border-outline-variant rounded-[8px] font-medium mb-8 cursor-not-allowed opacity-70" title="Payment integration coming soon">Buy Paid API (Coming Soon)</button>
           )}
           
           <div className="flex-1">
@@ -177,7 +177,7 @@ export default function SubscriptionPlansPage() {
           {currentPlan === 'Enterprise' ? (
             <button className="w-full py-2.5 bg-surface-container-high text-on-surface-variant border border-outline-variant rounded-[8px] font-medium mb-8 cursor-default" disabled>Manage Plan</button>
           ) : (
-            <button onClick={() => setCurrentPlan('Enterprise')} className="w-full py-2.5 bg-primary text-on-primary rounded-[8px] font-medium hover:bg-primary-container transition-colors mb-8 cursor-pointer">Upgrade to Enterprise</button>
+            <button disabled className="w-full py-2.5 bg-surface-container-high text-on-surface-variant border border-outline-variant rounded-[8px] font-medium mb-8 cursor-not-allowed opacity-70" title="Payment integration coming soon">Buy Paid API (Coming Soon)</button>
           )}
           
           <div className="flex-1">
