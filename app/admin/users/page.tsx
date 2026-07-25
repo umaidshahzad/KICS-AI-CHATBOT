@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { AdminService } from '../../../services/admin.service';
 
 export default function UserManagementPage() {
+  const { data: session } = useSession();
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -18,6 +20,7 @@ export default function UserManagementPage() {
   
   // Form State
   const [formData, setFormData] = useState({ name: '', email: '', role: 'user', apiLimit: 100000, status: 'active' });
+  const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -36,6 +39,7 @@ export default function UserManagementPage() {
   const openAddModal = () => {
     setModalMode('create');
     setFormData({ name: '', email: '', role: 'user', apiLimit: 100000, status: 'active' });
+    setFormError(null);
     setUserModalOpen(true);
   };
 
@@ -49,10 +53,12 @@ export default function UserManagementPage() {
       apiLimit: user.apiLimit,
       status: user.status
     });
+    setFormError(null);
     setUserModalOpen(true);
   };
 
   const handleSaveUser = async () => {
+    setFormError(null);
     try {
       if (modalMode === 'create') {
         const newUser = await AdminService.createUserFromRequest(formData.name, formData.email);
@@ -62,12 +68,22 @@ export default function UserManagementPage() {
         newUser.status = formData.status;
         setUsers([...users, newUser]);
       } else if (modalMode === 'edit' && editingUser) {
-        // For mock, just update local state
-        setUsers(users.map(u => u.id === editingUser.id ? { ...u, ...formData } : u));
+        const res = await fetch('/api/mock/admin/users', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: editingUser.id, ...formData })
+        });
+        
+        if (res.ok) {
+          setUsers(users.map(u => u.id === editingUser.id ? { ...u, ...formData } : u));
+        } else {
+          throw new Error('Failed to update user');
+        }
       }
       setUserModalOpen(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setFormError(err.message || 'An error occurred while saving.');
     }
   };
 
@@ -80,6 +96,7 @@ export default function UserManagementPage() {
   }
 
   const filteredUsers = users.filter((u) => {
+    if (session?.user?.email && u.email === session.user.email) return false;
     const matchesSearch = u.name.toLowerCase().includes(searchQuery.toLowerCase()) || u.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRole = filterRole === 'all' || u.role.toLowerCase() === filterRole;
     return matchesSearch && matchesRole;
@@ -201,9 +218,19 @@ export default function UserManagementPage() {
                           <span className="material-symbols-outlined text-[18px]">edit</span>
                         </button>
                         <button 
-                          onClick={() => {
+                          onClick={async () => {
                             if (confirm(`Are you sure you want to delete ${u.name}?`)) {
-                              setUsers(users.filter(user => user.id !== u.id));
+                              try {
+                                const res = await fetch(`/api/mock/admin/users?id=${u.id}`, { method: 'DELETE' });
+                                if (res.ok) {
+                                  setUsers(users.filter(user => user.id !== u.id));
+                                } else {
+                                  alert('Failed to delete user');
+                                }
+                              } catch (err) {
+                                console.error(err);
+                                alert('Error deleting user');
+                              }
                             }
                           }}
                           className="text-error hover:bg-error-container p-1.5 rounded-full transition-colors cursor-pointer" title="Delete User"
