@@ -88,3 +88,90 @@ The mock endpoints currently pull structural data from the `data/users.json` and
 ### 4. Authentication (NextAuth)
 The application is pre-configured to use NextAuth in `app/api/auth/[...nextauth]/route.ts`. 
 - To wire up real database authentication, implement a custom credentials provider or connect your database adapter (Prisma, TypeORM, MongoDB) directly inside the NextAuth configuration file.
+
+---
+
+## 🛠️ Backend Developer Guide (Endpoints & Schemas)
+
+To fully replace the mock backend, the backend team needs to implement the following endpoints and adhere to these data schemas.
+
+### Core Data Schemas
+
+**1. User Schema (Applies to Users, Admins, and Superadmins)**
+All users share a similar base schema, differentiated by the `role` field.
+```typescript
+interface User {
+  id: string; // Unique identifier (e.g., UUID or MongoDB ObjectId)
+  name: string;
+  email: string;
+  password?: string; // Hashed password (never returned to frontend)
+  role: 'user' | 'admin' | 'superadmin';
+  apiLimit: number; // Max allowed tokens/API usage
+  tokensUsed: number; // Tokens consumed so far
+  apiUsed: number; // Alternate usage metric (optional)
+  createdAt: string; // ISO 8601 Date String
+  status: 'active' | 'inactive' | 'suspended';
+  lastLogin?: string; // ISO 8601 Date String
+  avatar?: string; // Base64 string or URL to profile picture
+}
+```
+
+**2. Chat Session Schema**
+```typescript
+interface ChatSession {
+  id: string;
+  title: string;
+  lastUpdated: string; // ISO 8601 Date String
+  messages: ChatMessage[];
+}
+
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string; // ISO 8601 Date String
+}
+```
+
+**3. Access Request Schema**
+```typescript
+interface AccessRequest {
+  id: string;
+  name: string;
+  email: string;
+  company: string;
+  role: string;
+  useCase: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string; // ISO 8601 Date String
+}
+```
+
+### Endpoints to Implement
+
+The frontend expects the following RESTful endpoints. Update the base URL in the frontend services (`frontend/services/*.ts`) to point to your live server.
+
+#### 🙎‍♂️ User Endpoints (User Dashboard)
+- **`GET /api/user/profile`** - Fetch the logged-in user's profile details.
+- **`PUT /api/user/profile`** - Update profile details (name, password) and Avatar (handles `multipart/form-data`).
+- **`GET /api/user/billing`** - Fetch usage analytics (Assigned Model, Tokens Used, and 7-Day daily usage history array).
+- **`GET /api/chats`** - Fetch all chat sessions for the logged-in user.
+- **`POST /api/chats`** - Create a new chat session or append a message to an existing session.
+
+#### 🛡️ Admin Endpoints (Admin Portal)
+- **`GET /api/admin/users`** - Fetch all users managed by the Admin.
+- **`POST /api/admin/users`** - Create a new user (assigns credentials and API limits).
+- **`PUT /api/admin/users`** - Update an existing user's details or limits.
+- **`DELETE /api/admin/users`** - Delete or suspend a user.
+- **`GET /api/admin/requests`** - Fetch all pending access requests.
+- **`PUT /api/admin/requests`** - Approve or reject an access request.
+
+#### 👑 Super Admin Endpoints (Global Control)
+- **`GET /api/users`** - Fetch ALL users across the entire platform.
+- **`POST /api/users`** - Create a global user/admin.
+- **`DELETE /api/users`** - Delete a global user.
+
+### Important Notes for Backend Developers:
+1. **Avatar Uploads:** The `PUT /api/user/profile` endpoint on the frontend sends `multipart/form-data` with a `File` object when the user changes their avatar. The backend must handle file parsing (e.g., using Multer in Node.js or FastAPI UploadFile) and store the image securely (e.g., AWS S3).
+2. **NextAuth:** The `app/api/auth/[...nextauth]/route.ts` file is currently configured to authenticate against the mock `data/users.json`. You must update the `authorize` function in this file to query your real database and verify the hashed passwords.
+3. **Usage Analytics:** The system uses a Managed B2B Model. Users do not pay directly; instead, Admins assign models and API limits. The `GET /api/user/billing` endpoint must return an `assignedModel` string and a `dailyUsage` array for the Recharts graph to render properly.
