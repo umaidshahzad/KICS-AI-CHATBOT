@@ -30,9 +30,9 @@ export default function ModelsManagementPage() {
       provider: 'Meta',
       version: 'Self-Hosted',
       icon: 'memory',
-      status: 'Degraded',
-      error: 'GPU VRAM Exhaustion Detected',
-      details: 'Cluster node 04 requires reboot. Serving capacity reduced by 25%.',
+      status: 'Disabled',
+      error: 'Model offline',
+      details: 'This model has been disabled by the Super Admin.',
     }
   ]);
   
@@ -80,15 +80,15 @@ export default function ModelsManagementPage() {
       {/* Bento Grid Layout for Models */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {models.map((model) => (
-          <div key={model.id} className={`bg-surface-container-lowest rounded-xl p-6 shadow-sm flex flex-col relative overflow-hidden transition-shadow hover:shadow-md border ${model.status === 'Degraded' ? 'border-error-container' : 'border-outline-variant/30'}`}>
+          <div key={model.id} className={`bg-surface-container-lowest rounded-xl p-6 shadow-sm flex flex-col relative overflow-hidden transition-shadow hover:shadow-md border ${model.status === 'Degraded' ? 'border-error-container' : model.status === 'Disabled' ? 'border-outline-variant opacity-70' : 'border-outline-variant/30'}`}>
             
             {model.status === 'Degraded' && (
               <div className="absolute top-0 left-0 w-1 h-full bg-error"></div>
             )}
             
-            <div className={`flex justify-between items-start mb-4 ${model.status === 'Degraded' ? 'pl-2' : ''}`}>
+            <div className={`flex justify-between items-start mb-4 ${(model.status === 'Degraded' || model.status === 'Disabled') ? 'pl-2' : ''}`}>
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-[8px] flex items-center justify-center ${model.status === 'Degraded' ? 'bg-error-container text-on-error-container' : 'bg-surface-container-low text-primary'}`}>
+                <div className={`w-12 h-12 rounded-[8px] flex items-center justify-center ${model.status === 'Degraded' ? 'bg-error-container text-on-error-container' : model.status === 'Disabled' ? 'bg-surface-container text-on-surface-variant' : 'bg-surface-container-low text-primary'}`}>
                   <span className="material-symbols-outlined">{model.icon}</span>
                 </div>
                 <div>
@@ -101,9 +101,13 @@ export default function ModelsManagementPage() {
                 <span className="px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] rounded-full font-label-sm text-label-sm flex items-center gap-1 border border-[#C8E6C9]">
                   <span className="w-2 h-2 rounded-full bg-[#4CAF50]"></span> Active
                 </span>
-              ) : (
+              ) : model.status === 'Degraded' ? (
                 <span className="px-3 py-1 bg-error-container text-on-error-container rounded-full font-label-sm text-label-sm flex items-center gap-1 border border-[#ffb4ab]">
                   <span className="material-symbols-outlined text-[14px]">error</span> Degraded
+                </span>
+              ) : (
+                <span className="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-sm text-label-sm flex items-center gap-1 border border-outline-variant">
+                  <span className="material-symbols-outlined text-[14px]">block</span> Disabled
                 </span>
               )}
             </div>
@@ -119,14 +123,19 @@ export default function ModelsManagementPage() {
                   <p className="font-headline-md text-headline-md">{model.latency}</p>
                 </div>
               </div>
-            ) : (
+            ) : model.status === 'Degraded' ? (
               <div className="p-4 bg-[#fff8f6] rounded-[8px] mb-6 border border-error-container pl-2 ml-2">
                 <p className="font-label-sm text-label-sm text-error mb-1">{model.error}</p>
                 <p className="font-body-md text-body-md text-on-surface-variant text-sm">{model.details}</p>
               </div>
+            ) : (
+              <div className="p-4 bg-surface-container-low rounded-[8px] mb-6 border border-outline-variant">
+                <p className="font-label-sm text-label-sm text-on-surface mb-1">{model.error}</p>
+                <p className="font-body-md text-body-md text-on-surface-variant text-sm">{model.details}</p>
+              </div>
             )}
 
-            <div className={`mt-auto flex gap-3 pt-4 border-t border-outline-variant/50 ${model.status === 'Degraded' ? 'pl-2' : ''}`}>
+            <div className={`mt-auto flex gap-3 pt-4 border-t border-outline-variant/50 ${(model.status === 'Degraded' || model.status === 'Disabled') ? 'pl-2' : ''}`}>
               {model.status === 'Active' ? (
                 <>
                   <button 
@@ -142,19 +151,34 @@ export default function ModelsManagementPage() {
                     View Logs
                   </button>
                 </>
-              ) : (
+              ) : model.status === 'Degraded' ? (
                 <>
                   <button 
                     onClick={() => setModalContent({ title: 'Diagnostics', message: 'VRAM is exhausted on Node 04 due to a memory leak in the attention heads.' })}
                     className="flex-1 py-2 text-center border border-outline-variant rounded-[8px] font-label-sm text-label-sm text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer"
                   >
-                    Diagnose
+                    Run Diagnostics
                   </button>
                   <button 
                     onClick={() => handleRestartNode(model.id)}
-                    className="flex-1 py-2 text-center bg-surface-container-low text-on-surface rounded-[8px] font-label-sm text-label-sm hover:bg-surface-variant transition-colors cursor-pointer"
+                    className="flex-1 py-2 text-center bg-error text-on-error rounded-[8px] font-label-sm text-label-sm hover:bg-error/90 transition-colors cursor-pointer shadow-sm"
                   >
                     Restart Node
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    disabled
+                    className="flex-1 py-2 text-center border border-outline-variant rounded-[8px] font-label-sm text-label-sm text-on-surface opacity-50 cursor-not-allowed"
+                  >
+                    Configure
+                  </button>
+                  <button 
+                    disabled
+                    className="flex-1 py-2 text-center border border-outline-variant rounded-[8px] font-label-sm text-label-sm text-on-surface opacity-50 cursor-not-allowed"
+                  >
+                    View Logs
                   </button>
                 </>
               )}
