@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([
@@ -9,6 +9,22 @@ export default function NotificationsPage() {
     { id: 3, title: 'System Update', message: 'The platform will be undergoing scheduled maintenance at 2:00 AM UTC.', time: '1 day ago', read: true },
     { id: 4, title: 'New Model Available', message: 'GPT-4 Turbo is now available for all enterprise users.', time: '2 days ago', read: true },
   ]);
+//use SSE for notifications
+  useEffect(() => {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const eventSource = new EventSource(`${API_BASE_URL}/v1/notifications/stream`);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const newNotification = JSON.parse(event.data);
+        setNotifications((prev) => [newNotification, ...prev]);
+      } catch (err) {
+        console.error("Error parsing notification:", err);
+      }
+    };
+
+    return () => eventSource.close();
+  }, []);
 
   const markAllAsRead = () => {
     setNotifications(notifications.map(n => ({ ...n, read: true })));
