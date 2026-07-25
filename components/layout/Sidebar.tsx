@@ -48,10 +48,10 @@ export function Sidebar() {
 
   return (
     <aside className={`
-      bg-surface-container-lowest dark:bg-inverse-surface 
-      text-primary dark:text-inverse-primary 
+      bg-surface-container-lowest dark:bg-gradient-to-b dark:from-surface-container-highest dark:to-background
+      text-primary dark:text-white
       w-sidebar-width h-screen fixed left-0 top-0 
-      border-r border-outline-variant dark:border-outline 
+      border-r border-outline-variant dark:border-outline-variant/30
       flex flex-col h-full z-50 transition-transform duration-300
       ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       md:translate-x-0 md:flex
@@ -63,8 +63,8 @@ export function Sidebar() {
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>smart_toy</span>
           </div>
           <div>
-            <h1 className="text-headline-lg font-headline-lg text-primary dark:text-inverse-primary">AI Studio</h1>
-            <span className="font-label-caps text-label-caps text-on-surface-variant">
+            <h1 className="text-headline-lg font-headline-lg text-primary dark:text-white font-bold">AI Studio</h1>
+            <span className="font-label-caps text-label-caps text-on-surface-variant dark:text-gray-400">
               {(session?.user as any)?.role === 'admin' ? 'Admin Plan' : 'Pro Plan'}
             </span>
           </div>

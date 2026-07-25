@@ -3,6 +3,8 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 import { Sidebar } from "../../components/layout/Sidebar";
 import { Header } from "../../components/layout/Header";
 
@@ -13,6 +15,7 @@ export default function DashboardLayout({
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const theme = useSelector((state: RootState) => state.ui.theme);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -29,7 +32,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="bg-background text-on-background font-body-md h-screen overflow-hidden flex">
+    <div className={`bg-background text-on-background font-body-md h-screen overflow-hidden flex ${theme === 'dark' ? 'dark' : ''}`}>
       <Sidebar />
       <main className="flex-1 flex flex-col md:ml-sidebar-width h-full relative">
         <Header />
