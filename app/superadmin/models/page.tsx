@@ -187,12 +187,13 @@ export default function SuperAdminModelsPage() {
               </div>
               
               <div>
-                <label className="block font-label-sm text-xs font-bold text-on-surface-variant mb-1.5">API Endpoint</label>
+                <label className="block font-label-sm text-xs font-bold text-on-surface-variant mb-1.5">API Key</label>
                 <input 
-                  type="text" 
+                  type="password" 
                   value={model.endpoint}
                   onChange={e => updateModel(model.id, 'endpoint', e.target.value)}
                   disabled={!model.isActive}
+                  placeholder="sk-..."
                   className="w-full bg-surface-container border border-outline-variant focus:border-primary rounded-lg px-4 py-2 font-body-md text-primary font-mono text-sm transition-all truncate outline-none disabled:opacity-50" 
                 />
               </div>
@@ -229,14 +230,14 @@ export default function SuperAdminModelsPage() {
               </div>
               
               <div>
-                <label className="block font-label-sm font-bold text-on-surface-variant uppercase tracking-wider mb-1">API Endpoint</label>
+                <label className="block font-label-sm font-bold text-on-surface-variant uppercase tracking-wider mb-1">API Key</label>
                 <input 
-                  type="url" 
+                  type="password" 
                   required
                   value={newModel.endpoint}
                   onChange={e => setNewModel({...newModel, endpoint: e.target.value})}
                   className="w-full bg-surface-container border border-outline-variant rounded-lg px-4 py-2 text-on-surface focus:outline-none focus:border-primary font-mono text-sm"
-                  placeholder="https://api.example.com/v1/..."
+                  placeholder="sk-..."
                 />
               </div>
 
