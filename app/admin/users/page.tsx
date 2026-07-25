@@ -17,6 +17,8 @@ export default function UserManagementPage() {
   // Filtering & Search
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 10;
   
   // Form State
   const [formData, setFormData] = useState({ name: '', email: '', role: 'user', apiLimit: 100000, status: 'active' });
@@ -102,6 +104,14 @@ export default function UserManagementPage() {
     return matchesSearch && matchesRole;
   });
 
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage) || 1;
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  
+  const paginatedUsers = filteredUsers.slice(
+    (safeCurrentPage - 1) * usersPerPage, 
+    safeCurrentPage * usersPerPage
+  );
+
   return (
     <div className="max-w-container-max mx-auto space-y-lg pb-8">
       {/* Header Section */}
@@ -159,13 +169,13 @@ export default function UserManagementPage() {
               </tr>
             </thead>
             <tbody className="font-body-sm text-body-sm text-primary divide-y divide-outline-variant/50">
-              {filteredUsers.length === 0 ? (
+              {paginatedUsers.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center text-on-surface-variant">
                     No users found matching your criteria.
                   </td>
                 </tr>
-              ) : filteredUsers.map((u) => {
+              ) : paginatedUsers.map((u) => {
                 const usagePercentage = (u.tokensUsed / u.apiLimit) * 100;
                 const isOverLimit = usagePercentage >= 100;
 
@@ -248,13 +258,23 @@ export default function UserManagementPage() {
         
         {/* Pagination */}
         <div className="p-4 border-t border-outline-variant flex items-center justify-between bg-surface-container-lowest">
-          <span className="font-body-sm text-on-surface-variant">Showing {filteredUsers.length} entries</span>
+          <span className="font-body-sm text-on-surface-variant">
+            Showing {((safeCurrentPage - 1) * usersPerPage) + (paginatedUsers.length > 0 ? 1 : 0)} to {((safeCurrentPage - 1) * usersPerPage) + paginatedUsers.length} of {filteredUsers.length} entries
+          </span>
           <div className="flex gap-2">
-            <button className="p-2 border border-outline-variant rounded hover:bg-surface-container-high text-on-surface-variant transition-colors disabled:opacity-50" disabled>
+            <button 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              className="p-2 border border-outline-variant rounded hover:bg-surface-container-high text-on-surface-variant transition-colors disabled:opacity-50 cursor-pointer" 
+              disabled={safeCurrentPage === 1}
+            >
               <span className="material-symbols-outlined text-sm">chevron_left</span>
             </button>
-            <button className="px-3 py-1 bg-primary text-on-primary rounded font-label-md cursor-pointer">1</button>
-            <button className="p-2 border border-outline-variant rounded hover:bg-surface-container-high text-on-surface-variant transition-colors disabled:opacity-50" disabled>
+            <button className="px-3 py-1 bg-primary text-on-primary rounded font-label-md cursor-pointer">{safeCurrentPage}</button>
+            <button 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              className="p-2 border border-outline-variant rounded hover:bg-surface-container-high text-on-surface-variant transition-colors disabled:opacity-50 cursor-pointer" 
+              disabled={safeCurrentPage === totalPages}
+            >
               <span className="material-symbols-outlined text-sm">chevron_right</span>
             </button>
           </div>
