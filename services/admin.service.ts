@@ -13,13 +13,27 @@ export class AdminService {
     return res.json();
   }
 
+  static async updateUserStatus(id: string, status: string) {
+    const res = await fetch('/api/mock/admin/users', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status })
+    });
+    return res.json();
+  }
+
   static async createUserFromRequest(name: string, email: string) {
     const res = await fetch('/api/mock/admin/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email })
     });
-    return res.json();
+    
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to create user');
+    }
+    return data;
   }
 
   static async getAccessRequests() {
