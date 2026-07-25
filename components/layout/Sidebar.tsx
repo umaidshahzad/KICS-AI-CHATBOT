@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { toggleSidebar } from '../../store/slices/uiSlice';
 import { setActiveSession, createNewSession } from '../../store/slices/chatSlice';
+import { UserService } from '../../services/user.service';
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -19,6 +20,29 @@ export function Sidebar() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      if (session?.user?.email) {
+        try {
+          const data = await UserService.fetchProfile(session.user.email);
+          setUserProfile(data);
+        } catch (e) {
+          console.error('Failed to fetch sidebar profile', e);
+        }
+      }
+    }
+    
+    fetchProfile();
+
+    const handleProfileChange = () => {
+      fetchProfile();
+    };
+
+    window.addEventListener('userAvatarChanged', handleProfileChange);
+    return () => window.removeEventListener('userAvatarChanged', handleProfileChange);
+  }, [session]);
 
   const isActive = (path: string) => pathname === path;
 
@@ -169,10 +193,14 @@ export function Sidebar() {
           </Link>
         )}
         <Link href="/dashboard/profile" className="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface dark:text-outline-variant dark:hover:text-white hover:bg-surface-container-high dark:hover:bg-surface-tint/50 transition-colors duration-200 rounded-[8px] cursor-pointer active:opacity-80">
-          <div className="w-6 h-6 rounded-[8px] bg-primary flex items-center justify-center text-white font-bold">
-            {session?.user?.name?.[0] || 'U'}
+          <div className="w-6 h-6 rounded-[8px] bg-primary flex items-center justify-center text-white font-bold overflow-hidden">
+            {userProfile?.avatar ? (
+              <img src={userProfile.avatar} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              (userProfile?.name?.[0] || session?.user?.name?.[0] || 'U').toUpperCase()
+            )}
           </div>
-          <span className="font-body-sm text-body-sm flex-1 truncate">{session?.user?.name || 'Profile'}</span>
+          <span className="font-body-sm text-body-sm flex-1 truncate">{userProfile?.name || session?.user?.name || 'Profile'}</span>
         </Link>
         <button onClick={() => signOut({ callbackUrl: '/login' })} className="w-full flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface dark:text-outline-variant dark:hover:text-white hover:bg-surface-container-high dark:hover:bg-surface-tint/50 transition-colors duration-200 rounded-[8px] cursor-pointer active:opacity-80">
           <span className="material-symbols-outlined">logout</span>

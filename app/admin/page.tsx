@@ -113,8 +113,8 @@ export default function AdminDashboardPage() {
                 <tr key={u.id} className="hover:bg-surface-container-low transition-colors group">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-surface-container-highest flex-shrink-0 flex items-center justify-center text-primary font-bold">
-                        {u.name.charAt(0)}
+                      <div className="w-8 h-8 rounded-full bg-surface-container-highest flex-shrink-0 flex items-center justify-center text-primary font-bold overflow-hidden">
+                        {u.avatar ? <img src={u.avatar} alt="Profile" className="w-full h-full object-cover" /> : u.name.charAt(0)}
                       </div>
                       <div>
                         <p className="font-semibold text-on-background">{u.name}</p>
