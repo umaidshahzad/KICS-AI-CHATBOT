@@ -1,177 +1,137 @@
-# AI Chatbot Frontend
+<div align="center">
+  <h1>🎓 University Admissions Portal</h1>
+  <p><i>A centralized, role-based platform for streamlining university admissions.</i></p>
+  
+  <a href="https://admission-portal-mjey.onrender.com/"><strong>🚀 View Live Deployment</strong></a>
+  
+  <br />
+  <br />
 
-This is a modern Next.js React frontend built for an AI Chatbot platform. It contains multiple tailored interfaces including a standard user flow, an Admin portal, and a Super Admin control center. 
-
-The application currently relies on a mocked backend for demonstrations, making it easy for the backend team to clone, understand the routing structure, and swap the mock data sources for real database connections.
-
----
-
-## 🚀 Quick Start & Installation
-
-1. **Clone the repository** (if you haven't already).
-2. **Navigate to the frontend directory**:
-   ```bash
-   cd frontend
-   ```
-3. **Install Dependencies**:
-   This project uses standard `npm` (or `yarn`/`pnpm`).
-   ```bash
-   npm install
-   ```
-4. **Environment Variables**:
-   Copy the example environment file and fill in your actual credentials.
-   ```bash
-   cp .env.example .env.local
-   ```
-5. **Run the Development Server**:
-   ```bash
-   npm run dev
-   ```
-   The application will be running on `http://localhost:3000`.
+  ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+  ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+  ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+  ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+  ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+  ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+  ![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
+</div>
 
 ---
 
-## 🗺️ Application Routing & Flow
+## ✨ Overview
+The **University Admissions Portal** is a full-stack monolithic web application designed to handle the entire student admission lifecycle. From student registration and document uploads to administrator reviews and automated merit list generation, this platform connects applicants with university staff seamlessly.
 
-The application is built using Next.js **App Router** (`app/` directory). The routes are broken down by role and functionality.
+## 🛠️ Tech Stack & Technologies
 
-### Authentication Flow (`app/(auth)`)
-- `/login`: The main login page (supports credentials, Google, GitHub).
-- `/request-access`: Page for users to request access if they don't have an account.
+### 💻 Frontend
+* **React 19 & Vite 6:** Lightning-fast UI rendering and compilation.
+* **TypeScript:** Strictly typed codebase for fewer runtime errors.
+* **TailwindCSS 4:** Modern, utility-first responsive styling.
+* **Framer Motion / Motion:** Smooth micro-animations and page transitions.
+* **Lucide React:** Clean and scalable SVG icons.
+* **React Context API:** Lightweight, prop-drilling-free global state management.
 
-### User Flow
-- `/`: The main application page for a standard authenticated user. Displays the chat interface and sidebars for history.
-
-### Admin Portal (`app/admin`)
-- `/admin`: Dashboard showing workspace analytics and chatbot engagement.
-- `/admin/users`: User management interface.
-- `/admin/conversations`: Logs of chat interactions.
-- `/admin/profile`: Admin profile settings.
-
-### Super Admin Portal (`app/superadmin`)
-- `/superadmin`: Global platform overview (system health, deployments, global analytics).
-- `/superadmin/admins`: Interface to manage system, billing, and support admins.
-- `/superadmin/analytics`: Detailed global revenue and interaction charts.
-- `/superadmin/models`: AI model configurations and API key management.
-- `/superadmin/settings`: Global system settings.
-- `/superadmin/profile`: Super Admin profile configuration.
+### ⚙️ Backend
+* **Node.js & Express.js:** Robust server routing and request handling.
+* **Monolithic Vite Middleware:** Vite runs directly within Express during development to completely eliminate CORS issues.
+* **MongoDB Atlas & Mongoose 9:** Cloud NoSQL database with rigid schema validation.
+* **JWT & bcryptjs:** Secure authentication flows and password hashing.
+* **Multer (MemoryStorage):** Efficient handling of `multipart/form-data` for transcripts and proposals.
 
 ---
 
-## 🔌 Integrating the Real Backend
+## 👥 User Roles & Permissions
 
-Currently, the frontend uses "mock" routes and static JSON files to simulate backend responses. The backend team should follow these steps to connect the real database and APIs:
-
-### 1. Removing the Mock API Routes
-Inside the `app/api/mock/` directory, you will find simulated endpoints (e.g., `app/api/mock/users/route.ts`, `app/api/mock/chats/route.ts`).
-- You can either **replace the contents** of these route handlers to communicate directly with your actual backend services (using standard `fetch` or Axios).
-- OR, you can **delete the `mock` folder entirely** and point the frontend components to fetch data from your external backend server URL.
-
-### 2. Updating Component Fetch Requests
-If you search the codebase for `fetch('/api/mock/...`, you will see where the frontend components are requesting data. 
-- Example in `app/admin/users/page.tsx`:
-  ```typescript
-  // Currently fetching mock data:
-  const res = await fetch('/api/mock/users'); 
-  ```
-- Change these endpoints to point to your live backend server:
-  ```typescript
-  // Updated for live backend:
-  const res = await fetch('https://api.yourbackend.com/v1/users'); 
-  ```
-
-### 3. Data Schema Alignment
-The mock endpoints currently pull structural data from the `data/users.json` and `data/chatHistory.json` files.
-- Review these JSON files to understand the exact data structures, fields, and types the frontend components expect to receive.
-- Ensure your backend endpoints return JSON structures that match these schemas to avoid breaking the UI tables and charts.
-
-### 4. Authentication (NextAuth)
-The application is pre-configured to use NextAuth in `app/api/auth/[...nextauth]/route.ts`. 
-- To wire up real database authentication, implement a custom credentials provider or connect your database adapter (Prisma, TypeORM, MongoDB) directly inside the NextAuth configuration file.
+| Role | Responsibilities |
+| :--- | :--- |
+| 🧑🎓 **Applicant** | Register, browse programs, submit applications (with transcripts/documents), and track admission status. |
+| 🧐 **Admissions Officer** | Review submitted documents and verify or reject applicant credentials. |
+| 🧑🏫 **Department Head** | Define degree programs, set capacity/merit criteria, add entry test scores, and generate final merit lists. |
+| 👑 **System Admin** | God-mode. Manage all user roles, oversee high-level analytics, and configure global portal settings. |
 
 ---
 
-## 🛠️ Backend Developer Guide (Endpoints & Schemas)
+## 🔄 Application Flow
 
-To fully replace the mock backend, the backend team needs to implement the following endpoints and adhere to these data schemas.
+1. **Browsing:** Users land on the portal and browse available programs (e.g., BS Computer Science, MS Physics).
+2. **Applying:** A student registers, fills out an application, and uploads their transcripts.
+3. **Verification:** An **Admissions Officer** logs in, reviews the uploaded documents, and marks them as `Verified`.
+4. **Testing:** The **Department Head** inputs the student's entry test scores into the system.
+5. **Selection:** Once the deadline passes, the **Department Head** clicks `Generate Merit List`. The system auto-calculates composite scores (based on past academics + test scores) and admits the top `N` students based on program capacity!
 
-### Core Data Schemas
+---
 
-**1. User Schema (Applies to Users, Admins, and Superadmins)**
-All users share a similar base schema, differentiated by the `role` field.
-```typescript
-interface User {
-  id: string; // Unique identifier (e.g., UUID or MongoDB ObjectId)
-  name: string;
-  email: string;
-  password?: string; // Hashed password (never returned to frontend)
-  role: 'user' | 'admin' | 'superadmin';
-  apiLimit: number; // Max allowed tokens/API usage
-  tokensUsed: number; // Tokens consumed so far
-  apiUsed: number; // Alternate usage metric (optional)
-  createdAt: string; // ISO 8601 Date String
-  status: 'active' | 'inactive' | 'suspended';
-  lastLogin?: string; // ISO 8601 Date String
-  avatar?: string; // Base64 string or URL to profile picture
-}
+## 📂 Folder Structure
+
+```text
+📦 admission-portal
+ ┣ 📂 backend
+ ┃ ┣ 📂 config          # Database connection strings
+ ┃ ┣ 📂 controllers     # Business logic for auth, programs, and applications
+ ┃ ┣ 📂 middleware      # JWT validation and Role-Based Access Control (RBAC)
+ ┃ ┣ 📂 models          # Mongoose DB Schemas
+ ┃ ┗ 📂 routes          # Express API route definitions
+ ┣ 📂 src               # React Frontend
+ ┃ ┣ 📂 components      # Reusable UI components & Dashboards
+ ┃ ┣ 📂 context         # Global AppContext (State Management)
+ ┃ ┣ 📂 types           # Shared TypeScript interfaces
+ ┃ ┣ 📜 App.tsx         # Main React Router
+ ┃ ┣ 📜 index.css       # Tailwind configuration & global styles
+ ┃ ┗ 📜 main.tsx        # React DOM Entry Point
+ ┣ 📜 .env.example      # Environment variable template
+ ┣ 📜 package.json      # Dependencies and scripts
+ ┣ 📜 server.ts         # Main Express Server Entry Point
+ ┗ 📜 vite.config.ts    # Vite bundler configuration
 ```
 
-**2. Chat Session Schema**
-```typescript
-interface ChatSession {
-  id: string;
-  title: string;
-  lastUpdated: string; // ISO 8601 Date String
-  messages: ChatMessage[];
-}
+---
 
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string; // ISO 8601 Date String
-}
+## 🚀 Getting Started (Local Development)
+
+### 1️⃣ Clone the repository
+```bash
+git clone https://github.com/your-username/admission-portal.git
+cd admission-portal
 ```
 
-**3. Access Request Schema**
-```typescript
-interface AccessRequest {
-  id: string;
-  name: string;
-  email: string;
-  company: string;
-  role: string;
-  useCase: string;
-  status: 'pending' | 'approved' | 'rejected';
-  createdAt: string; // ISO 8601 Date String
-}
+### 2️⃣ Install dependencies
+```bash
+npm install
 ```
 
-### Endpoints to Implement
+### 3️⃣ Set up environment variables
+Create a `.env` file in the root directory and add the following:
+```env
+MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/admission_db
+JWT_SECRET=your_super_secret_jwt_key
+NODE_ENV=development
+```
 
-The frontend expects the following RESTful endpoints. Update the base URL in the frontend services (`frontend/services/*.ts`) to point to your live server.
+### 4️⃣ Start the Development Server
+```bash
+npm run dev
+```
+The server and frontend will both boot up concurrently at `http://localhost:3000`.
 
-#### 🙎‍♂️ User Endpoints (User Dashboard)
-- **`GET /api/user/profile`** - Fetch the logged-in user's profile details.
-- **`PUT /api/user/profile`** - Update profile details (name, password) and Avatar (handles `multipart/form-data`).
-- **`GET /api/user/billing`** - Fetch usage analytics (Assigned Model, Tokens Used, and 7-Day daily usage history array).
-- **`GET /api/chats`** - Fetch all chat sessions for the logged-in user.
-- **`POST /api/chats`** - Create a new chat session or append a message to an existing session.
+---
 
-#### 🛡️ Admin Endpoints (Admin Portal)
-- **`GET /api/admin/users`** - Fetch all users managed by the Admin.
-- **`POST /api/admin/users`** - Create a new user (assigns credentials and API limits).
-- **`PUT /api/admin/users`** - Update an existing user's details or limits.
-- **`DELETE /api/admin/users`** - Delete or suspend a user.
-- **`GET /api/admin/requests`** - Fetch all pending access requests.
-- **`PUT /api/admin/requests`** - Approve or reject an access request.
+## 🌐 Deployment (Render)
 
-#### 👑 Super Admin Endpoints (Global Control)
-- **`GET /api/users`** - Fetch ALL users across the entire platform.
-- **`POST /api/users`** - Create a global user/admin.
-- **`DELETE /api/users`** - Delete a global user.
+This project is configured for continuous deployment on **Render** as a monolithic web service. 
+* **Build Command:** `npm run build` *(Runs Vite build, then bundles the Express server to ESM via esbuild).*
+* **Start Command:** `npm start` *(Executes `node dist/server.js`).*
 
-### Important Notes for Backend Developers:
-1. **Avatar Uploads:** The `PUT /api/user/profile` endpoint on the frontend sends `multipart/form-data` with a `File` object when the user changes their avatar. The backend must handle file parsing (e.g., using Multer in Node.js or FastAPI UploadFile) and store the image securely (e.g., AWS S3).
-2. **NextAuth:** The `app/api/auth/[...nextauth]/route.ts` file is currently configured to authenticate against the mock `data/users.json`. You must update the `authorize` function in this file to query your real database and verify the hashed passwords.
-3. **Usage Analytics:** The system uses a Managed B2B Model. Users do not pay directly; instead, Admins assign models and API limits. The `GET /api/user/billing` endpoint must return an `assignedModel` string and a `dailyUsage` array for the Recharts graph to render properly.
+---
+
+## 📡 API Reference Summary
+
+The backend exposes a secure REST API. Protected routes require a `Bearer <token>` in the Authorization header.
+
+* 🔐 **Auth:** `/api/auth/register`, `/api/auth/login`, `/api/auth/me`, `/api/auth/users`
+* 📚 **Programs:** `/api/programs` (GET, POST, PUT, DELETE)
+* 📝 **Applications:** `/api/applications/apply`, `/api/applications/my-applications`, `/api/applications/:id/verify`, `/api/applications/generate-merit-list/:programId`
+
+---
+<div align="center">
+  <i>Built with ❤️ for better education management.</i>
+</div>
